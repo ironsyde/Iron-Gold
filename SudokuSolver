@@ -1,0 +1,175 @@
+mport java.util.*;
+
+
+
+public class BenSudoku {
+    public static void main(String[] args) {
+
+        Scanner input = new Scanner(System.in);
+        long startTime = System.nanoTime();
+
+        int[][] InputGrid = new int[10][10];
+        for (int r = 1; r <= 9; ++r) {
+            for (int c = 1; c <= 9; ++c) {
+                if (input.hasNextInt()) {
+                    InputGrid[r][c] = input.nextInt();
+                }
+            }
+        }
+         //make possibilities array
+        boolean[][][] possibleValues = new boolean[10][10][10];
+        for(int i = 1; i <= 9; i++){
+            for (int j = 1; j<= 9; j++){
+                java.util.Arrays.fill(possibleValues[i][j], true);
+            }
+        }
+
+        boolean madeProgress = true;
+        while (madeProgress) {
+            int preCount = countCompletedSquares(InputGrid);
+            possibleValues = algorithm1(InputGrid, possibleValues);
+            InputGrid = setSquaresFromPoss(InputGrid, possibleValues);
+            int postCount = countCompletedSquares(InputGrid);
+            if (preCount == postCount){
+                madeProgress = false;
+            }
+        }
+
+        System.out.println("");
+        for (int i = 1; i <= 9; ++i) {
+            for (int j = 1; j <= 9; ++j) {
+                System.out.print(InputGrid[i][j] + " ");
+            }
+            System.out.println("");
+        }
+        System.out.println("Number of squares solved: " + countCompletedSquares(InputGrid));
+        System.out.println("Elapsed time is " + (System.nanoTime() - startTime) / 1000 + " microseconds");
+
+        input.close();
+    }
+
+    public static int countCompletedSquares(int[][] sudokuGrid) {
+        int count = 0;
+        for (int r = 1; r <= 9; ++r) {
+            for (int c = 1; c <= 9; ++c) {
+                if (sudokuGrid[r][c] > 0) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    public static int[][] setSquaresFromPoss(int[][] sudokuGrid, boolean[][][] possible){
+        for (int i = 1; i <= 9; i++) {
+            for (int j = 1; j <= 9; j++) {
+                int numOfPoss = 0;
+                for (int k = 1; k <= 9; k++) {
+                    if (possible[i][j][k]) {
+                        numOfPoss += 1;
+                    }
+                }
+                if (numOfPoss == 1) {
+                    for (int l = 1; l <= 9; l++) {
+                        if (possible[i][j][l])
+                            sudokuGrid[i][j] = l;
+                    }
+                }
+
+            }
+        }
+        return sudokuGrid;
+    }
+
+    public static boolean[][][] algorithm1(int[][] sudokuGrid, boolean[][][] possible) {
+        for (int i = 1; i <= 9; i++) {
+            for (int j = 1; j <= 9; j++) {
+                //for each box, remove values in the same row from possibilities
+                for (int p = 1; p <= 9; p++) {
+                    int valueInRow = sudokuGrid[i][p];
+                    possible[i][j][valueInRow] = false;
+                }
+                //for each box, remove values in the same column from possibilities
+                for (int p = 1; p <= 9; p++) {
+                    int valueInColumn = sudokuGrid[p][j];
+                    possible[i][j][valueInColumn] = false;
+                }
+                //for each box, remove values in same 3x3 from possibilities
+                //top left
+                if (i  < 4 && j < 4){
+                    for (int k = 1; k<4; k++){
+                        for (int l = 1; l<4; l++){
+                            possible[i][j][sudokuGrid[k][l]] = false;
+                        }
+                    }
+                }
+                //top middle
+                if (i  < 4 && 3 < j && j < 7){
+                    for (int k = 1; k<4; k++){
+                        for (int l = 4; l<7; l++){
+                            possible[i][j][sudokuGrid[k][l]] = false;
+                        }
+                    }
+                }
+                //top right
+                if (i  < 4 && 6 < j){
+                    for (int k = 1; k<4; k++){
+                        for (int l = 7; l<10; l++){
+                            possible[i][j][sudokuGrid[k][l]] = false;
+                        }
+                    }
+                }
+                //middle left
+                if (3 < i && i < 7 && j < 4){
+                    for (int k = 4; k<7; k++){
+                        for (int l = 1; l<4; l++){
+                            possible[i][j][sudokuGrid[k][l]] = false;
+                        }
+                    }
+                }
+                //bottom left
+                if (6 < i && j < 4){
+                    for (int k = 7; k<10; k++){
+                        for (int l = 1; l<4; l++){
+                            possible[i][j][sudokuGrid[k][l]] = false;
+                        }
+                    }
+                }
+                //center
+                if (3 < i && i < 7 && 3 < j && j < 7){
+                    for (int k = 4; k<7; k++){
+                        for (int l = 4; l<7; l++){
+                            possible[i][j][sudokuGrid[k][l]] = false;
+                        }
+                    }
+                }
+                //middle bottom
+                if (6 < i && 3 < j && j < 7){
+                    for (int k = 7; k<10; k++){
+                        for (int l = 4; l<7; l++){
+                            possible[i][j][sudokuGrid[k][l]] = false;
+                        }
+                    }
+                }
+                //middle right
+                if (3 < i && i < 7 &&  6 < j){
+                    for (int k = 4; k<7; k++){
+                        for (int l = 7; l<10; l++){
+                            possible[i][j][sudokuGrid[k][l]] = false;
+                        }
+                    }
+                }
+                //bottom right
+                if (6 < i && 6 < j){
+                    for (int k = 7; k<10; k++){
+                        for (int l = 7; l<10; l++){
+                            possible[i][j][sudokuGrid[k][l]] = false;
+                        }
+                    }
+                }
+                }
+            }
+
+    return possible;
+    }
+}
